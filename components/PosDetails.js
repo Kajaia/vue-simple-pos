@@ -1,5 +1,5 @@
-app.component('pos-details', {
-    template:
+app.component("pos-details", {
+  template:
     /*html*/
     `
     <div class="container-fluid">
@@ -93,7 +93,7 @@ app.component('pos-details', {
                                 class="text-white py-1"
                                 v-if="cart.length > 0"
                             >
-                                Total Price: $ {{finalPrice}}
+                                Total Price: $ {{finalPrice.toFixed(2)}}
                             </h5>
                         </div>
                         <div 
@@ -205,7 +205,7 @@ app.component('pos-details', {
                             Total price
                             </div>
                             <span class="badge bg-success rounded-pill">
-                                $ {{finalPrice}}
+                                $ {{finalPrice.toFixed(2)}}
                             </span>
                         </li>
                     </ul>
@@ -215,80 +215,87 @@ app.component('pos-details', {
     </div>
     <div class="overlay" v-show="payModal" @click="closePayModal"></div>
     `,
-    data() {
-        return {
-            products: null,
-            cart: [],
-            tax: 10,
-            discount: 0,
-            shipping: 2.99,
-            payModal: false
+  data() {
+    return {
+      products: null,
+      cart: [],
+      tax: 10,
+      discount: 0,
+      shipping: 2.99,
+      payModal: false,
+    };
+  },
+  methods: {
+    addToCart(product) {
+      var whichProduct;
+      var existing = this.cart.filter(function (item, index) {
+        if (item.product.id == Number(product.id)) {
+          whichProduct = index;
+          return true;
+        } else {
+          return false;
         }
-    },
-    methods: {
-        addToCart(product) {
-            var whichProduct;
-            var existing = this.cart.filter(function (item, index) {
-                if (item.product.id == Number(product.id)) {
-                whichProduct = index;
-                return true;
-                } else {
-                return false;
-                }
-            });
+      });
 
-            if (existing.length) {
-                this.cart[whichProduct].qty++;
-            } else {
-                this.cart.push({ product: product, qty: 1 });
-            }
-        },
-        removeFromCart(id) {
-            if (this.cart[id].qty > 1) {
-                this.cart[id].qty--;
-            } else {
-                this.cart.splice(id, 1);
-            }
-        },
-        resetCart(product) {
-            this.cart.splice(product);
+      if (existing.length) {
+        this.cart[whichProduct].qty++;
+      } else {
+        this.cart.push({ product: product, qty: 1 });
+      }
+    },
+    removeFromCart(id) {
+      if (this.cart[id].qty > 1) {
+        this.cart[id].qty--;
+      } else {
+        this.cart.splice(id, 1);
+      }
+    },
+    resetCart(product) {
+      this.cart.splice(product);
 
-            this.tax = 10;
-            this.discount = 0;
-            this.shipping = 2.99;
-        },
-        openPayModal() {
-            this.payModal = true;
-        },
-        closePayModal() {
-            this.payModal = false;
-        }
+      this.tax = 10;
+      this.discount = 0;
+      this.shipping = 2.99;
     },
-    computed: {
-        totalPrice() {
-            let sum = 0;
-            for (key in this.cart) {
-                sum = sum + this.cart[key].product.price * this.cart[key].qty;
-            }
-            return sum;
-        },
-        cartQty() {
-            let qty = 0;
-            for(key in this.cart) {
-                qty = qty + this.cart[key].qty;
-            }
-            return qty;
-        },
-        serviceTax() {
-            return Number(this.tax) / 100;
-        },
-        finalPrice() {
-            return (this.totalPrice - Number(this.discount) + Number(this.shipping)) + (this.serviceTax * this.totalPrice);
-        }
+    openPayModal() {
+      this.payModal = true;
     },
-    mounted() {
-        fetch('https://hplussport.com/api/products/order/price').then(response => response.json()).then(data => {
-            this.products = data;
-        })
-    }
-})
+    closePayModal() {
+      this.payModal = false;
+    },
+  },
+  computed: {
+    totalPrice() {
+      let sum = 0;
+      for (key in this.cart) {
+        sum = sum + this.cart[key].product.price * this.cart[key].qty;
+      }
+      return sum;
+    },
+    cartQty() {
+      let qty = 0;
+      for (key in this.cart) {
+        qty = qty + this.cart[key].qty;
+      }
+      return qty;
+    },
+    serviceTax() {
+      return Number(this.tax) / 100;
+    },
+    finalPrice() {
+      return (
+        this.totalPrice -
+        Number(this.discount) +
+        Number(this.shipping) +
+        this.serviceTax * this.totalPrice
+      );
+    },
+  },
+  mounted() {
+    fetch("https://hplussport.com/api/products/order/price")
+      .then((response) => response.json())
+      .then((data) => {
+        this.products = data;
+      });
+  },
+});
