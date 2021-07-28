@@ -133,19 +133,19 @@ app.component("pos-details", {
                                 v-for="(product, index) in products"
                                 :key="index"
                             >
-                                <div class="card rounded border-0 shadow product">
+                                <div class="card h-100 rounded border-0 shadow product">
                                     <a 
                                         class="stretched-link" 
                                         href="#!"
                                         @click="addToCart(product)"
                                     >
-                                        <img :src="product.image" :alt="product.name" class="card-img">
+                                        <img :src="product.image" :alt="product.name" class="card-img" loading="lazy">
                                     </a>
                                     <span class="badge bg-primary rounded-pill shadow position-absolute m-2">
                                         $ {{product.price}}
                                     </span>
                                     <div class="card-content px-3 py-2">
-                                        <h6><small>{{product.name}}</small></h6>
+                                        <h6 class="fw-bold"><small>{{product.name}}</small></h6>
                                         <p><small># {{product.id}}</small></p>
                                     </div>
                                 </div>
